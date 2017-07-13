@@ -1,38 +1,40 @@
 <?php
-
-    header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
     header('Access-Control-Allow-Origin: *');
-    header('Access-Control-Allow-Headers: origin, x-requested-with, content-type');
+    header("Access-Control-Allow-Credentials: true");
+    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+    header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization");
 
- 
     include_once('contacts.php');
     require_once('db.php');
    
-    $con= mysqli_connect($HOST, $USER, $PASS, $DBNAME) or die(mysqli_connect_error());
+    if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+        $connection = mysqli_connect($HOST, $USER, $PASS,$DBNAME); 
 
-    
-if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-    $result = mysqli_query($con,"select * from contacts");
-    $data = array();
+        $result = mysqli_query($connection,"select * from contacts");
+        $data = array();
 
-    while ($row = mysqli_fetch_array($result)) {
-    $data[] = array("nom"=>$row['nom'],"prenom"=>$row['prenom'],"email"=>$row['email']);
+        while ($row = mysqli_fetch_array($result)) {
+        $data[] = array("nom"=>$row['nom'],"prenom"=>$row['prenom'],"email"=>$row['email']);
+        }
+        echo json_encode($data);
     }
-    echo json_encode($data);
-}
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && empty($_POST)) {
-    
-    $data = json_decode(file_get_contents("php://input"));
-    
-   // @$nom = $request->nom;
-   $nom = mysqli_real_escape_string($data->nom);
-   $prenom = mysqli_real_escape_string($data->prenom);
-   $email = mysqli_real_escape_string($data->email);
 
-   mysql_query("INSERT INTO contacts (nom, prenom, email) VALUES ($nom, $prenom, $email)");
-}
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
+        $connection = new PDO("mysql:host=$HOST;dbname=$DBNAME", $USER, $PASS);   
+        $_POST = json_decode(file_get_contents('php://input'), true);
+
+        if(!empty($_POST['nom'])&& !empty($_POST['prenom']) && !empty($_POST['email'])) {
+            $ins_query=$connection->prepare("insert into contacts (nom, prenom, email) values( :nom, :prenom, :email)");
+            $ins_query->bindParam(':nom', $_POST['nom']);
+            $ins_query->bindParam(':prenom', $_POST['prenom']);
+            $ins_query->bindParam(':email', $_POST['email']);
+            $ins_query->execute();
+        }
+        $result = $connection->prepare("select * from contacts");
+        $result->execute();
+        echo json_encode($result->fetchAll());
+    }
 
 ?>
-
