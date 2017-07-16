@@ -14,7 +14,7 @@
         $data = array();
 
         while ($row = mysqli_fetch_array($result)) {
-        $data[] = array("nom"=>$row['nom'],"prenom"=>$row['prenom'],"email"=>$row['email']);
+        $data[] = array("nom"=>$row['nom'],"prenom"=>$row['prenom'],"email"=>$row['email'], "id"=>$row['id']);
         }
         echo json_encode($data);
     }
@@ -32,9 +32,25 @@
             $ins_query->bindParam(':email', $_POST['email']);
             $ins_query->execute();
         }
+
         $result = $connection->prepare("select * from contacts");
         $result->execute();
         echo json_encode($result->fetchAll());
     }
+
+    if  ($_SERVER['REQUEST_METHOD'] == 'DELETE'){
+
+        $connection = new PDO("mysql:host=$HOST;dbname=$DBNAME", $USER, $PASS); 
+        $_GET = json_decode(file_get_contents('php://input'), true);
+        $id = $_GET ['id'];
+        var_dump($id);
+        
+        $sql =  $connection->prepare("DELETE FROM contacts WHERE id = '$id'");
+        $result = $sql->execute();
+        echo json_encode($result);
+        
+}
+
+
 
 ?>
