@@ -43,14 +43,23 @@
         $connection = new PDO("mysql:host=$HOST;dbname=$DBNAME", $USER, $PASS); 
         $_GET = json_decode(file_get_contents('php://input'), true);
         $id = $_GET ['id'];
-        var_dump($id);
         
         $sql =  $connection->prepare("DELETE FROM contacts WHERE id = '$id'");
         $result = $sql->execute();
         echo json_encode($result);
-        
-}
+    }
 
+    if ($_SERVER['REQUEST_METHOD'] == 'PUT'){
 
+        $connection = new PDO("mysql:host=$HOST;dbname=$DBNAME", $USER, $PASS); 
+        $id = $_GET ['id'];
+        $nom = $_GET ['nom'];
+        $prenom = $_GET ['prenom'];
+        $email = $_GET ['email'];
+
+        $sql =$connection->prepare("UPDATE contacts SET nom='$nom', prenom='$prenom', email='$email' WHERE id='$id'");
+        $result = $sql->execute();
+        echo json_encode($result);
+    }
 
 ?>
