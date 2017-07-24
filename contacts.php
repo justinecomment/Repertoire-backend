@@ -15,10 +15,12 @@
             $sql = $connection->query("SELECT * FROM contacts WHERE nom='$searchvalue'");
           
             while ($result = $sql->fetch()){
-                echo $result['nom'];
-                echo $result['prenom'];
-                echo $result['email'];
+                 $data[] = array("nom"=>$result['nom'],
+                                "prenom"=>$result['prenom'],
+                                "email"=>$result['email'],
+                                "id"=>$result['id']);
             }
+             echo json_encode($data);
         }
 
         else{
