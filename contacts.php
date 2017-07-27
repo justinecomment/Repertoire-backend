@@ -43,7 +43,6 @@
         $connection = new PDO("mysql:host=$HOST;dbname=$DBNAME", $USER, $PASS);   
         $_POST = json_decode(file_get_contents('php://input'), true);
        
-        
         if(!empty($_POST['nom'])&& !empty($_POST['prenom']) && !empty($_POST['email'])) {
             $ins_query=$connection->prepare("insert into contacts (nom, prenom, email) values( :nom, :prenom, :email)");
             $ins_query->bindParam(':nom', $_POST['nom']);
