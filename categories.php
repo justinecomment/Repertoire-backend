@@ -13,7 +13,8 @@
         $connection = new PDO("mysql:host=$HOST;dbname=$DBNAME", $USER, $PASS);  
         $sql = $connection->query("SELECT * FROM categories");
          while ($result = $sql->fetch()){
-                 $data[] = array("nom"=>$result['nom']);
+                 $data[] = array("nom"=>$result['nom'],
+                                 "id"=>$result['id']);
          }
          echo json_encode($data);
     }
@@ -32,7 +33,17 @@
             $result->execute();
             echo json_encode($result->fetchAll());
         }
+    }
 
+    if ($_SERVER['REQUEST_METHOD'] == 'PUT'){
+        
+        $connection = new PDO("mysql:host=$HOST;dbname=$DBNAME", $USER, $PASS); 
+        $id = $_GET['id'];  
+        $category = $_GET['category'];  
+       
+        $sql =$connection->prepare("UPDATE categories SET nom='$category' WHERE id='$id'");
+        $result = $sql->execute();
+        echo json_encode($result);
     }
 
 ?>
