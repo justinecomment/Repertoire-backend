@@ -46,4 +46,16 @@
         echo json_encode($result);
     }
 
+    if  ($_SERVER['REQUEST_METHOD'] == 'DELETE'){
+
+        $connection = new PDO("mysql:host=$HOST;dbname=$DBNAME", $USER, $PASS); 
+        $_GET = json_decode(file_get_contents('php://input'), true);
+        $id = $_GET ['id'];
+        
+        $sql =  $connection->prepare("DELETE FROM categories WHERE id = '$id'");
+        $result = $sql->execute();
+        echo json_encode($result);
+    }
+
+
 ?>
