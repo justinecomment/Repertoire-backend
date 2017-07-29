@@ -13,8 +13,8 @@
         $connection = new PDO("mysql:host=$HOST;dbname=$DBNAME", $USER, $PASS);  
         $sql = $connection->query("SELECT * FROM categories");
          while ($result = $sql->fetch()){
-                 $data[] = array("nom"=>$result['nom'],
-                                 "id"=>$result['id']);
+                 $data[] = array("nom_categories"=>$result['nom_categories'],
+                                 "id_categories"=>$result['id_categories']);
          }
          echo json_encode($data);
     }
@@ -26,7 +26,7 @@
         $categorie =  $_POST['categorieName'];
 
         if(!empty($_POST['categorieName'])) {
-            $ins_query=$connection->prepare("insert into categories (nom) values('$categorie')");
+            $ins_query=$connection->prepare("insert into categories (nom_categories) values('$categorie')");
             $ins_query->execute();
 
             $result = $connection->prepare("select * from categories");
@@ -41,7 +41,7 @@
         $id = $_GET['id'];  
         $category = $_GET['category'];  
        
-        $sql =$connection->prepare("UPDATE categories SET nom='$category' WHERE id='$id'");
+        $sql =$connection->prepare("UPDATE categories SET nom_categories='$category' WHERE id_categories='$id'");
         $result = $sql->execute();
         echo json_encode($result);
     }
@@ -52,7 +52,7 @@
         $_GET = json_decode(file_get_contents('php://input'), true);
         $id = $_GET ['id'];
         
-        $sql =  $connection->prepare("DELETE FROM categories WHERE id = '$id'");
+        $sql =  $connection->prepare("DELETE FROM categories WHERE id_categories = '$id'");
         $result = $sql->execute();
         echo json_encode($result);
     }
