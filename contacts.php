@@ -15,23 +15,26 @@
             $sql = $connection->query("SELECT * FROM contacts WHERE nom_contacts='$searchvalue'");
           
             while ($result = $sql->fetch()){
-                 $data[] = array("nom_contacts"=>$result['nom'],
-                                "prenom_contacts"=>$result['prenom'],
-                                "email_contacts"=>$result['email'],
-                                "id_contacts"=>$result['id']);
+                 $data[] = array("nom_contacts"=>$result['nom_contacts'],
+                                "prenom_contacts"=>$result['prenom_contacts'],
+                                "email_contacts"=>$result['email_contacts'],
+                                "id_contacts"=>$result['id_contacts']);
             }
              echo json_encode($data);
         }
 
         else{
             $connection = mysqli_connect($HOST, $USER, $PASS,$DBNAME); 
-            $result = mysqli_query($connection,"select * from contacts");
+            $result = mysqli_query($connection,"SELECT * FROM contacts INNER JOIN categorie ON FK_Categorie = id_categorie");
 
             while ($row = mysqli_fetch_array($result)) {
                 $data[] = array("nom_contacts"=>$row['nom_contacts'],
                                 "prenom_contacts"=>$row['prenom_contacts'],
                                 "email_contacts"=>$row['email_contacts'],
-                                "id_contacts"=>$row['id_contacts']);
+                                "id_contacts"=>$row['id_contacts'],
+                                "FK_Categorie"=>$row['FK_Categorie'],
+                                "id_categorie"=>$row['id_categorie'],
+                                "nom_categorie"=>$row['nom_categorie']);
             }
             echo json_encode($data);
         }
@@ -45,9 +48,9 @@
        
         if(!empty($_POST['nom'])&& !empty($_POST['prenom']) && !empty($_POST['email'])) {
             $ins_query=$connection->prepare("insert into contacts (nom_contacts, prenom_contacts, email_contacts) values( :nom, :prenom, :email)");
-            $ins_query->bindParam(':nom', $_POST['nom_contacts']);
-            $ins_query->bindParam(':prenom', $_POST['prenom_contacts']);
-            $ins_query->bindParam(':email', $_POST['email_contacts']);
+            $ins_query->bindParam(':nom', $_POST['nom']);
+            $ins_query->bindParam(':prenom', $_POST['prenom']);
+            $ins_query->bindParam(':email', $_POST['email']);
             $ins_query->execute();
 
             $result = $connection->prepare("select * from contacts");
@@ -70,14 +73,28 @@
     if ($_SERVER['REQUEST_METHOD'] == 'PUT'){
 
         $connection = new PDO("mysql:host=$HOST;dbname=$DBNAME", $USER, $PASS); 
-        $id = $_GET ['id'];
-        $nom = $_GET ['nom'];
-        $prenom = $_GET ['prenom'];
-        $email = $_GET ['email'];
+        $_GET = json_decode(file_get_contents('php://input'), true);
 
-        $sql =$connection->prepare("UPDATE contacts SET nom_contacts='$nom', prenom_contacts='$prenom', email_contacts='$email' WHERE id_contacts='$id'");
-        $result = $sql->execute();
-        echo json_encode($result);
+        if(isset($_GET['join'])){
+            $nomCategorie = $_GET['join'];
+            $id_contact = $_GET['id_contact'];
+
+            $sql=$connection->prepare("UPDATE `contacts` SET `FK_Categorie`=(SELECT id_categorie FROM categorie WHERE nom_categorie ='$nomCategorie') WHERE id_contacts='$id_contact'");
+            $resultat = $sql->execute();
+            echo json_encode($resultat);
+        }
+
+        else{
+            $id = $_GET ['id'];
+            $nom = $_GET ['nom'];
+            $prenom = $_GET ['prenom'];
+            $email = $_GET ['email'];
+
+            $sql =$connection->prepare("UPDATE contacts SET nom_contacts='$nom', prenom_contacts='$prenom', email_contacts='$email' WHERE id_contacts='$id'");
+        
+            $result = $sql->execute();
+            echo json_encode($result);
+        }
     }
 
 ?>

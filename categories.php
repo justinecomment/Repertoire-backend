@@ -11,27 +11,25 @@
 
     if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         $connection = new PDO("mysql:host=$HOST;dbname=$DBNAME", $USER, $PASS);  
-        $sql = $connection->query("SELECT * FROM categories");
+        $sql = $connection->query("SELECT * FROM categorie");
          while ($result = $sql->fetch()){
-                 $data[] = array("nom_categories"=>$result['nom_categories'],
-                                 "id_categories"=>$result['id_categories']);
+                 $data[] = array("nom_categorie"=>$result['nom_categorie'],
+                                 "id_categorie"=>$result['id_categorie']);
          }
          echo json_encode($data);
     }
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-       
         $connection = new PDO("mysql:host=$HOST;dbname=$DBNAME", $USER, $PASS);   
+       
         $_POST = json_decode(file_get_contents('php://input'), true);
         $categorie =  $_POST['categorieName'];
 
         if(!empty($_POST['categorieName'])) {
-            $ins_query=$connection->prepare("insert into categories (nom_categories) values('$categorie')");
-            $ins_query->execute();
+            $sql=$connection->prepare("insert into categorie (nom_categorie) values('$categorie')");
+            $resultat = $sql->execute();
 
-            $result = $connection->prepare("select * from categories");
-            $result->execute();
-            echo json_encode($result->fetchAll());
+            echo json_encode($resultat);
         }
     }
 
@@ -41,7 +39,7 @@
         $id = $_GET['id'];  
         $category = $_GET['category'];  
        
-        $sql =$connection->prepare("UPDATE categories SET nom_categories='$category' WHERE id_categories='$id'");
+        $sql =$connection->prepare("UPDATE categorie SET nom_categorie='$category' WHERE id_categorie='$id'");
         $result = $sql->execute();
         echo json_encode($result);
     }
@@ -52,7 +50,7 @@
         $_GET = json_decode(file_get_contents('php://input'), true);
         $id = $_GET ['id'];
         
-        $sql =  $connection->prepare("DELETE FROM categories WHERE id_categories = '$id'");
+        $sql =  $connection->prepare("DELETE FROM categorie WHERE id_categorie = '$id'");
         $result = $sql->execute();
         echo json_encode($result);
     }
