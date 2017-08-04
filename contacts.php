@@ -73,13 +73,13 @@
     if ($_SERVER['REQUEST_METHOD'] == 'PUT'){
 
         $connection = new PDO("mysql:host=$HOST;dbname=$DBNAME", $USER, $PASS); 
-        $_GET = json_decode(file_get_contents('php://input'), true);
+        // $_GET = json_decode(file_get_contents('php://input'), true);
 
-        if(isset($_GET['join'])){
-            $nomCategorie = $_GET['join'];
+        if($_REQUEST){
+            $nomCategorie = $_GET['nom_cat'];
             $id_contact = $_GET['id_contact'];
 
-            $sql=$connection->prepare("UPDATE `contacts` SET `FK_Categorie`=(SELECT id_categorie FROM categorie WHERE nom_categorie ='$nomCategorie') WHERE id_contacts='$id_contact'");
+            $sql = $connection->prepare("UPDATE `contacts` SET `FK_Categorie`=(SELECT id_categorie FROM categorie WHERE nom_categorie ='$nomCategorie') WHERE id_contacts='$id_contact'");
             $resultat = $sql->execute();
             echo json_encode($resultat);
         }
@@ -95,6 +95,6 @@
             $result = $sql->execute();
             echo json_encode($result);
         }
-    }
+     }
 
 ?>
